@@ -69,7 +69,39 @@ def part1(data):
     return steps
 
 def part2(data):
-    return None
+    start = (-1,-1)
+    for line in data:
+        if line.find('S') != -1:
+            start = (line.find('S'), data.index(line))
+            break
+    currents = [start, start]
+    visited = []
+    while currents[0] != currents[1] or len(visited) == 0:
+        visited.append(currents[0])
+        visited.append(currents[1])
+        moves1 = get_moves(currents[0], data)
+        moves2 = get_moves(currents[1], data)
+        if data[currents[0][1]][currents[0][0]] == 'S':
+            currents[0] = moves1[0]
+            currents[1] = moves2[1]
+        else:
+            currents[0] = moves1[0] if moves1[0] not in visited else moves1[1]
+            currents[1] = moves2[0] if moves2[0] not in visited else moves2[1]
+    visited.append(currents[0])
+
+    inside = []
+    last = ''
+    for y in range(len(data)):
+        outside = True
+        for x in range(len(data[y])):
+            if (x, y) in visited:
+                if data[y][x] != '-' and last + data[y][x] not in ['L7', 'FJ']:
+                    outside = not outside
+                    last = data[y][x]
+            else:
+                if not outside:
+                    inside.append((x,y))
+    return len(inside)
 
 if __name__ == '__main__':
     filename = 'input' if '-t' not in sys.argv else 'test'
